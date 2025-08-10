@@ -1,0 +1,6 @@
+@Movie_Watchlist_web_api__angular___core_net_web_api__HostAddress = http://localhost:5129
+
+GET {{Movie_Watchlist_web_api__angular___core_net_web_api__HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
