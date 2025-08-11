@@ -8,7 +8,9 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor
         public DB_Constructor(DbContextOptions<DB_Constructor> options) : base(options)
         {
         }
-        public DbSet<UserMovies> UserMovies { get; set; } = null!;
+        public DbSet<User> UserData { get; set; } = null!; // table for user data
+
+        public DbSet<UserMovies> UserMovies { get; set; } = null!; // table for user movies so that data can be generated and stored
 
     }
 }

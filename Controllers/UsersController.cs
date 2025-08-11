@@ -5,54 +5,61 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel;
 using Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor;
+using Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel;
 
 namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserMoviesController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly DB_Constructor _context;
 
-        public UserMoviesController(DB_Constructor context)
+        public UsersController(DB_Constructor context)
         {
             _context = context;
         }
 
-        // GET: api/UserMovies
+        // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserMovies>>> GetUserMovies()
+        public async Task<ActionResult<IEnumerable<User>>> GetUserData()
         {
-            return await _context.UserMovies.ToListAsync();
+            var users = 
+                await _context.UserData
+                .Include(u => u.UserMovies) // Include UserMovies to get the related movies for each user
+                .ToListAsync();
+
+            return users;
         }
 
-        // GET: api/UserMovies/5
+        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserMovies>> GetUserMovies(int id)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            var userMovies = await _context.UserMovies.FindAsync(id);
+            var user = await _context.UserData
+                .Include(u => u.UserMovies) 
+                .FirstOrDefaultAsync(u => u.UserId == id);
 
-            if (userMovies == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return userMovies;
+            return user;
         }
 
-        // PUT: api/UserMovies/5
+        // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserMovies(int id, UserMovies userMovies)
+        public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != userMovies.id)
+            if (id != user.UserId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(userMovies).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +67,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserMoviesExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +80,36 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             return NoContent();
         }
 
-        // POST: api/UserMovies
+        // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserMovies>> PostUserMovies(UserMovies userMovies)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.UserMovies.Add(userMovies);
+            _context.UserData.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUserMovies", new { id = userMovies.id }, userMovies);
+            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
 
-        // DELETE: api/UserMovies/5
+        // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserMovies(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var userMovies = await _context.UserMovies.FindAsync(id);
-            if (userMovies == null)
+            var user = await _context.UserData.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.UserMovies.Remove(userMovies);
+            _context.UserData.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool UserMoviesExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.UserMovies.Any(e => e.id == id);
+            return _context.UserData.Any(e => e.UserId == id);
         }
     }
 }

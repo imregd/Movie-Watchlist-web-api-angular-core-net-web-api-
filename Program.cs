@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Movie_Watchlist_web_api__angular___core_net_web_api_.DB_Constructor;
+using Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor;
 
 var builder = WebApplication.CreateBuilder(args);
 
