@@ -17,8 +17,10 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
         public bool MovieWatched { get; set; }
         public int? MovieRating { get; set; }
 
-        [JsonIgnore] // Prevent the infinite cycle error aka "Self-referencing loop detected"
+        
         public int UserId { get; set; } // Foreign key to the User class
+
+        [JsonIgnore] // Prevent the infinite cycle error aka "Self-referencing loop detected"
         public User User { get; set; } = null!; // Navigation property to the User class
 
         // the reason for this is so you can add multiple movies to a user
