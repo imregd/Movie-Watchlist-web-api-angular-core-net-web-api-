@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor;
 using Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel;
 
+
 namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 {
     [Route("api/[controller]")]
@@ -19,6 +20,14 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         public UsersController(DB_Constructor context)
         {
             _context = context;
+
+            var userdata = from b in _context.UserData
+                           select new UserDTO
+                           {
+                               UserId = b.UserId,
+                               UserMovies = b.UserMovies.ToList() 
+                           };
+
         }
 
         // GET: api/Users
@@ -83,12 +92,12 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDTO>> PostUser(UserDTO userdata)
         {
-            _context.UserData.Add(user);
+            _context.UserData.Add(userdata);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetUser", new { id = userdata.UserId }, userdata);
         }
 
         // DELETE: api/Users/5

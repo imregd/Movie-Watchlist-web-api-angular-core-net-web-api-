@@ -12,5 +12,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor
 
         public DbSet<UserMovies> UserMovies { get; set; } = null!; // table for user movies so that data can be generated and stored
 
+        public DbSet<UserDTO> UserDTOs { get; set; } = null!; // table for user DTOs to make POST easier for the user
     }
 }

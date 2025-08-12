@@ -17,7 +17,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
         public bool MovieWatched { get; set; }
         public int? MovieRating { get; set; }
 
-        
+
         public int UserId { get; set; } // Foreign key to the User class
 
         [JsonIgnore] // Prevent the infinite cycle error aka "Self-referencing loop detected"
@@ -26,4 +26,12 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
         // the reason for this is so you can add multiple movies to a user
         // it would allow movies to be easily added along the lines of User.UserMovies.Add(moviestuff)
     }
+
+    public class UserDTO // DTO to make POST easier for the user
+    {
+        public int UserId { get; set; }
+        public List<UserMovies> UserMovies { get; set; } = null!;
+    }
+
 }
+
