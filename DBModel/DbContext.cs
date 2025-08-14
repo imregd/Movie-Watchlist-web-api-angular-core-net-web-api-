@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
 {
@@ -12,7 +13,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
     }
     public class UserMovies
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public string MovieName { get; set; } = "";
         public bool MovieWatched { get; set; }
         public int? MovieRating { get; set; }
@@ -27,10 +28,22 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
         // it would allow movies to be easily added along the lines of User.UserMovies.Add(moviestuff)
     }
 
+    public class UserMoviesDTO
+    {
+        [Key]
+        public int Id { get; set; }
+        public string MovieName { get; set; } = "";
+        public bool MovieWatched { get; set; }
+        public int? MovieRating { get; set; }
+    }
+
+
+
     public class UserDTO // DTO to make POST easier for the user
     {
+        [Key] // doesnt recognise as key so you have to explicitly tell it that it's the key
         public int UserId { get; set; }
-        public List<UserMovies> UserMovies { get; set; } = null!;
+        public List<UserMoviesDTO> UserMovies { get; set; } = null!;
     }
 
 }

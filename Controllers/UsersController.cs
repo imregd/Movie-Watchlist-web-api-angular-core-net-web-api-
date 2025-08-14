@@ -15,53 +15,69 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+
         private readonly DB_Constructor _context;
+
 
         public UsersController(DB_Constructor context)
         {
             _context = context;
 
-            var userdata = from b in _context.UserData
-                           select new UserDTO
-                           {
-                               UserId = b.UserId,
-                               UserMovies = b.UserMovies.ToList() 
-                           };
-
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUserData()
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUserData()
         {
-            var users = 
-                await _context.UserData
-                .Include(u => u.UserMovies) // Include UserMovies to get the related movies for each user
-                .ToListAsync();
+            var userdata = await (from b in _context.UserData
+                                  select new UserDTO
+                                  {
+                                      UserId = b.UserId,
+                                      UserMovies = b.UserMovies
+                                                   .Select(m => new UserMoviesDTO
+                                                   {
+                                                       Id = m.Id,
+                                                       MovieName = m.MovieName,
+                                                       MovieWatched = m.MovieWatched,
+                                                       MovieRating = m.MovieRating
+                                                   }).ToList()
+                                  }).ToListAsync();
 
-            return users;
+            return userdata;
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUser(int id)
         {
-            var user = await _context.UserData
-                .Include(u => u.UserMovies) 
-                .FirstOrDefaultAsync(u => u.UserId == id);
+            var userdata = await (from b in _context.UserData
+                                  where b.UserId == id
+                                  select new UserDTO
+                                  {
+                                      UserId = b.UserId,
+                                      UserMovies = b.UserMovies
+                                                   .Select(m => new UserMoviesDTO
+                                                   {
+                                                       Id = m.Id,
+                                                       MovieName = m.MovieName,
+                                                       MovieWatched = m.MovieWatched,
+                                                       MovieRating = m.MovieRating
+                                                   }).ToList()
+                                  }).ToListAsync();
 
-            if (user == null)
+
+            if (userdata == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return userdata;
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserDTO user)
         {
             if (id != user.UserId)
             {
@@ -92,12 +108,12 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(UserDTO userdata)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.UserData.Add(userdata);
+            _context.UserData.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = userdata.UserId }, userdata);
+            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
 
         // DELETE: api/Users/5
