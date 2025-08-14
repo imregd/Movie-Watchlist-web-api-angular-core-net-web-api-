@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,18 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         private readonly DB_Constructor _context;
 
+        private readonly Expression<Func<User, UserDTO>> UserDTOMapper = user => new UserDTO //mapper so i dont have to reuse the same code over and over
+        {
+            UserId = user.UserId,
+            UserMovies = user.UserMovies
+                .Select(m => new UserMoviesDTO
+                {
+                    Id = m.Id,
+                    MovieName = m.MovieName,
+                    MovieWatched = m.MovieWatched,
+                    MovieRating = m.MovieRating
+                }).ToList()
+        };
 
         public UsersController(DB_Constructor context)
         {
@@ -29,41 +42,21 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUserData()
         {
-            var userdata = await (from b in _context.UserData
-                                  select new UserDTO
-                                  {
-                                      UserId = b.UserId,
-                                      UserMovies = b.UserMovies
-                                                   .Select(m => new UserMoviesDTO
-                                                   {
-                                                       Id = m.Id,
-                                                       MovieName = m.MovieName,
-                                                       MovieWatched = m.MovieWatched,
-                                                       MovieRating = m.MovieRating
-                                                   }).ToList()
-                                  }).ToListAsync();
+            var AllUsers = await _context.UserData
+                .Select(UserDTOMapper)
+                .ToListAsync();
 
-            return userdata;
+            return AllUsers;
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUser(int id)
+        public async Task<ActionResult<UserDTO>> GetUser(int id)
         {
-            var userdata = await (from b in _context.UserData
-                                  where b.UserId == id
-                                  select new UserDTO
-                                  {
-                                      UserId = b.UserId,
-                                      UserMovies = b.UserMovies
-                                                   .Select(m => new UserMoviesDTO
-                                                   {
-                                                       Id = m.Id,
-                                                       MovieName = m.MovieName,
-                                                       MovieWatched = m.MovieWatched,
-                                                       MovieRating = m.MovieRating
-                                                   }).ToList()
-                                  }).ToListAsync();
+            var userdata = await _context.UserData
+                .Where(u => u.UserId == id)
+                .Select(UserDTOMapper)
+                .FirstOrDefaultAsync();
 
 
             if (userdata == null)
