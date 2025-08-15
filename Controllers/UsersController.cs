@@ -21,11 +21,10 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         private readonly Expression<Func<User, UserDTO>> UserDTOMapper = user => new UserDTO //mapper so i dont have to reuse the same code over and over
         {
-            UserId = user.UserId,
+            Username = user.Username,
             UserMovies = user.UserMovies
                 .Select(m => new UserMoviesDTO
                 {
-                    Id = m.Id,
                     MovieName = m.MovieName,
                     MovieWatched = m.MovieWatched,
                     MovieRating = m.MovieRating
@@ -43,6 +42,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUserData()
         {
             var AllUsers = await _context.UserData
+                .Where(i => i.UserId > 0)
                 .Select(UserDTOMapper)
                 .ToListAsync();
 
@@ -72,41 +72,51 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, UserDTO user)
         {
-            if (id != user.UserId)
+
+            var userExists = await _context.UserData
+                .Include(u => u.UserMovies)
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (userExists == null!)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
+            userExists.Username = user.Username; // allows username to be changed, for now this is in but in the future will be removed or changed to a different system
+            userExists.UserMovies= user.UserMovies.Select(m => new UserMovies
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                MovieName = m.MovieName,
+                MovieWatched = m.MovieWatched,
+                MovieRating = m.MovieRating,
+            }).ToList();
 
+            
+
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser(UserDTO user)
         {
-            _context.UserData.Add(user);
+            var DTOConvert = new User
+            {
+                Username = user.Username,
+                UserMovies = user.UserMovies.Select(m => new UserMovies
+                {
+                    MovieName = m.MovieName,
+                    MovieWatched = m.MovieWatched,
+                    MovieRating = m.MovieRating,
+                }).ToList()
+            };
+
+
+            _context.UserData.Add(DTOConvert);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetUser", new { id = DTOConvert.UserId }, DTOConvert);
         }
 
         // DELETE: api/Users/5
