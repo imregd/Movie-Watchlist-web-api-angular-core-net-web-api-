@@ -134,10 +134,5 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
             return NoContent();
         }
-
-        private bool UserExists(int id)
-        {
-            return _context.UserData.Any(e => e.UserId == id);
-        }
     }
 }
