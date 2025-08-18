@@ -7,16 +7,12 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve",
+    "module": "ES2022",
     "moduleResolution": "node",
-    "baseUrl": "./",
-    "paths": {
-      "@angular/*": [ "node_modules/@angular/*" ]
-    }
+    "baseUrl": "./"
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -25,7 +21,6 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
-  "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.spec.json" }
