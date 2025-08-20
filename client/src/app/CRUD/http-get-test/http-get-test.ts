@@ -9,7 +9,7 @@ export class HttpGetService {
   }
 
   getUserData(): Observable<any> {
-    return this.http.get('https://localhost:7278/api/users');
+    return this.http.get('https://localhost:7278/api/Users');
   }
     
   }

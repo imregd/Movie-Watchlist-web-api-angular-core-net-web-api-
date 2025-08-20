@@ -11,8 +11,10 @@ import { CommonModule } from '@angular/common';
   template: `
     <h1>Welcome to {{ title() }}!</h1>
     <app-home></app-home>
+    <h2>Users</h2>
+    <p>Users are fetched from the API and displayed below:</p>
     <li *ngFor="let user of users$ | async">
-     User: {{user.Username}}
+     User: {{user.username}}
      </li>
     <router-outlet />
   `,
@@ -28,4 +30,4 @@ export class App {
   }
 
   
-}
+}//      User 2: {{user | json}} outputs all of it in a json array format
