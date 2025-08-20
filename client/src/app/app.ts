@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Home } from './home/home';
+import { Home } from './home/home/home';
 import { HttpGetService } from './CRUD/http-get-test/http-get-test';
 import { CommonModule } from '@angular/common';
 
