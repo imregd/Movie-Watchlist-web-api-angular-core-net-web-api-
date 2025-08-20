@@ -1,0 +1,12 @@
+[33m614dffc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mDB-setup-branch[m[33m, [m[1;31morigin/DB-setup-branch[m[33m)[m save current frontend whatever
+[33md74b838[m All CRUD operations have DTOs implemented, they no longer show the Ids when posting or putting or getting, this makes it easier to track and add new users, and removes the overwriting primary key problem, controller class not completely tested.
+[33m3f18714[m Changed how data was converted to DTO, not finished but i made a Mapper function that helped me use much less code and not use manual mapping as well as utilising sep of concerns more
+[33m6986bb6[m userdata setup in most crud operations, pushed as i want to change it to have a function that maps a db model/data thingy to a DTO
+[33m4bac51c[m all changes, needs to update post and puts
+[33md6e1475[m GET Request now shows the UserMovies for the user model
+[33m62fd451[m Updated code that has the rough layout of the User model and UserMovies model (infinite cycle error needs to be fixed)
+[33m97847ca[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m Merge pull request #1 from AleksVasjakins/Controller-and-SQLLite-server
+[33mff7d7e2[m[33m ([m[1;31morigin/Controller-and-SQLLite-server[m[33m, [m[1;32mController-and-SQLLite-server[m[33m)[m Save changes to controller branch
+[33m9e2fffa[m Current save for web api
+[33m5eb82a1[m Add project files.
+[33m4dac1f0[m Add .gitattributes and .gitignore.

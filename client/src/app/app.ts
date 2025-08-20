@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Home, CommonModule],
+  standalone: true,
   template: `
     <h1>Welcome to {{ title() }}!</h1>
     <app-home></app-home>
