@@ -19,17 +19,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         private readonly DB_Constructor _context;
 
-        private readonly Expression<Func<User, UserDTO>> UserDTOMapper = user => new UserDTO //mapper so i dont have to reuse the same code over and over
-        {
-            Username = user.Username,
-            UserMovies = user.UserMovies
-                .Select(m => new UserMoviesDTO
-                {
-                    MovieName = m.MovieName,
-                    MovieWatched = m.MovieWatched,
-                    MovieRating = m.MovieRating
-                }).ToList()
-        };
 
         public UsersController(DB_Constructor context)
         {
@@ -39,11 +28,20 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUserData()
+        public async Task<ActionResult<IEnumerable<UserDTORead>>> GetUserData()
         {
             var AllUsers = await _context.UserData
                 .Where(i => i.UserId > 0)
-                .Select(UserDTOMapper)
+                .Select(user => new UserDTORead
+                {
+                    Username = user.Username,
+                    UserMovies = user.UserMovies.Select(m => new UserMoviesDTO
+                    {
+                        MovieName = m.MovieName,
+                        MovieWatched = m.MovieWatched,
+                        MovieRating = m.MovieRating
+                    }).ToList()
+                })
                 .ToListAsync();
 
             return AllUsers;
@@ -51,31 +49,44 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(int id)
+        public async Task<ActionResult<IEnumerable<UserDTORead>>> GetUser(int id)
         {
-            var userdata = await _context.UserData
-                .Where(u => u.UserId == id)
-                .Select(UserDTOMapper)
-                .FirstOrDefaultAsync();
+            var UserSpecific = await _context.UserData
+                .Where(i => i.UserId == id)
+                .Select(user => new UserDTORead
+                {
+                    Username = user.Username,
+                    UserMovies = user.UserMovies.Select(m => new UserMoviesDTO
+                    {
+                        MovieName = m.MovieName,
+                        MovieWatched = m.MovieWatched,
+                        MovieRating = m.MovieRating
+                    }).ToList()
+                })
+                .ToListAsync();
 
 
-            if (userdata == null)
+            if (UserSpecific == null)
             {
                 return NotFound();
             }
 
-            return userdata;
+            return UserSpecific;
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, UserDTO user)
+        public async Task<IActionResult> PutUser(int id, UserDTORead user) // USERNAME CHANGE
         {
 
             var userExists = await _context.UserData
-                .Include(u => u.UserMovies)
-                .FirstOrDefaultAsync(u => u.UserId == id);
+                .Where(i => i.UserId == id)
+                .Select(u => new UserDTORead
+                {
+                    Username = u.Username,
+                })
+                .FirstOrDefaultAsync();
 
             if (userExists == null!)
             {
@@ -83,15 +94,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             }
 
             userExists.Username = user.Username; // allows username to be changed, for now this is in but in the future will be removed or changed to a different system
-            userExists.UserMovies= user.UserMovies.Select(m => new UserMovies
-            {
-                MovieName = m.MovieName,
-                MovieWatched = m.MovieWatched,
-                MovieRating = m.MovieRating,
-            }).ToList();
-
-            
-
+           
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -104,19 +107,13 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             var DTOConvert = new User
             {
                 Username = user.Username,
-                UserMovies = user.UserMovies.Select(m => new UserMovies
-                {
-                    MovieName = m.MovieName,
-                    MovieWatched = m.MovieWatched,
-                    MovieRating = m.MovieRating,
-                }).ToList()
             };
 
 
             _context.UserData.Add(DTOConvert);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = DTOConvert.UserId }, DTOConvert);
+            return CreatedAtAction("GetUser", new { id = DTOConvert.UserId }, new UserDTORead {Username = DTOConvert.Username, UserMovies = new List<UserMoviesDTO>() });
         }
 
         // DELETE: api/Users/5
