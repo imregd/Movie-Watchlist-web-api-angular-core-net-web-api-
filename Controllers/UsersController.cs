@@ -49,7 +49,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<UserDTORead>>> GetUser(int id)
+        public async Task<ActionResult<UserDTORead>> GetUser(int id)
         {
             var UserSpecific = await _context.UserData
                 .Where(i => i.UserId == id)
@@ -63,7 +63,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                         MovieRating = m.MovieRating
                     }).ToList()
                 })
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
 
             if (UserSpecific == null)
@@ -80,24 +80,18 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
         public async Task<IActionResult> PutUser(int id, UserDTORead user) // USERNAME CHANGE
         {
 
-            var userExists = await _context.UserData
-                .Where(i => i.UserId == id)
-                .Select(u => new UserDTORead
-                {
-                    Username = u.Username,
-                })
-                .FirstOrDefaultAsync();
-
-            if (userExists == null!)
+            var userEntity = await _context.UserData.FindAsync(id);
+            if (userEntity == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            userExists.Username = user.Username; // allows username to be changed, for now this is in but in the future will be removed or changed to a different system
-           
+            userEntity.Username = user.Username;
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -130,11 +124,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.UserData.Any(e => e.UserId == id);
         }
     }
 }
