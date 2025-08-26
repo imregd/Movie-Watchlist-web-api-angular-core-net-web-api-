@@ -32,7 +32,15 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel
         // it would allow movies to be easily added along the lines of User.UserMovies.Add(moviestuff)
     }
 
+    [Keyless]
     public class UserMoviesDTO
+    {
+        public string MovieName { get; set; } = "";
+        public bool MovieWatched { get; set; }
+        public int? MovieRating { get; set; }
+    }
+
+    public class UserMoviesDTOResponse
     {
         public int Id { get; set; }
         public string MovieName { get; set; } = "";

@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
+
 
 namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 {
@@ -25,7 +27,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         private readonly Expression<Func<UserMovies, UserMoviesDTO>> UserMoviesDTOMapper = usermovie => new UserMoviesDTO //mapper so i dont have to reuse the same code over and over
         {
-            Id = usermovie.Id,
             MovieName = usermovie.MovieName,
             MovieWatched = usermovie.MovieWatched,
             MovieRating = usermovie.MovieRating
@@ -44,12 +45,15 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             return movies;
         }
 
-        /*
+
         // GET: api/UserMovies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserMovies>> GetUserMovies(int id)
+        public async Task<ActionResult<IEnumerable<UserMoviesDTO>>> GetUserMovies(int userid, int id)
         {
-            var userMovies = await _context.UserMovies.FindAsync(id);
+            var userMovies = await _context.UserMovies
+                .Where(um => um.UserId == userid && um.Id == id) 
+                .Select(UserMoviesDTOMapper)
+                .ToListAsync();
 
             if (userMovies == null)
             {
@@ -59,13 +63,10 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             return userMovies;
         }
 
-        commented out because in the future i may add a future search query feature, where a user can search for a specific movie in their watchlist, idk tho
-        */
+        // commented out because in the future i may add a future search query feature, where a user can search for a specific movie in their watchlist, idk tho
 
-        // PUT: api/UserMovies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPatch("{userid}/{id}")]
-        public async Task<IActionResult> PutUserMovies(int userid,int id, UserMoviesDTO userMoviesDTO)
+        [HttpPatch("/{id}")]
+        public async Task<IActionResult> PatchUserMovies(int userid ,int id, [FromBody] JsonPatchDocument<UserMoviesDTO> UpdatedMovies)
         {
             var userMovies = await _context.UserMovies
                 .FirstOrDefaultAsync(um => um.Id == id && um.UserId == userid);
@@ -75,23 +76,31 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                 return NotFound();
             }
 
+            // thought of compiling the usermoviesdtomapper but it was unnecessary and could make it slower performance wise
             var movieDto = new UserMoviesDTO
             {
-                Id = userMovies.Id,
                 MovieName = userMovies.MovieName,
                 MovieWatched = userMovies.MovieWatched,
                 MovieRating = userMovies.MovieRating
             };
-            
 
+            UpdatedMovies.ApplyTo(movieDto, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            userMovies.MovieName = movieDto.MovieName;
+            userMovies.MovieWatched = movieDto.MovieWatched;
+            userMovies.MovieRating = movieDto.MovieRating;
 
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // POST: api/UserMovies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("{userid}")]
+        [HttpPost]
         public async Task<ActionResult<UserMoviesDTO>> PostUserMovies(int userid, UserMoviesDTO userMovies)
         {
             var user = await _context.UserData.FindAsync(userid);
@@ -109,20 +118,26 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                 UserId = userid // Associate the movie with the specified user
             };
 
+            var responsedto = new UserMoviesDTOResponse
+            {
+                Id = newUserMovie.Id,
+                MovieName = newUserMovie.MovieName,
+                MovieWatched = newUserMovie.MovieWatched,
+                MovieRating = newUserMovie.MovieRating
+            };
+
             _context.UserMovies.Add(newUserMovie);
             await _context.SaveChangesAsync();
 
-
-            userMovies.Id = newUserMovie.Id; // Set the ID of the DTO to the newly created entity's ID
-            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id }, userMovies);
+            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id, userid }, responsedto);
         }
 
         // DELETE: api/UserMovies/5
-        [HttpDelete("{userid}/{id}")]
-        public async Task<IActionResult> DeleteUserMovies(int userid, int id)
+        [HttpDelete("/{id}")]
+        public async Task<IActionResult> DeleteUserMovies(int UserID, int id)
         {
             var usermovie = await _context.UserMovies
-                .FirstOrDefaultAsync(um => um.Id == id && um.UserId == userid);
+                .FirstOrDefaultAsync(um => um.Id == id && um.UserId == UserID);
 
             if (usermovie == null)
             {
