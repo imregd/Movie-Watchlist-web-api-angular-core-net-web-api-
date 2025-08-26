@@ -27,7 +27,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         private readonly Expression<Func<UserMovies, UserMoviesDTO>> UserMoviesDTOMapper = usermovie => new UserMoviesDTO //mapper so i dont have to reuse the same code over and over
         {
-            Id = usermovie.Id,
             MovieName = usermovie.MovieName,
             MovieWatched = usermovie.MovieWatched,
             MovieRating = usermovie.MovieRating
@@ -78,7 +77,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             // thought of compiling the usermoviesdtomapper but it was unnecessary and could make it slower performance wise
             var movieDto = new UserMoviesDTO
             {
-                Id = userMovies.Id,
                 MovieName = userMovies.MovieName,
                 MovieWatched = userMovies.MovieWatched,
                 MovieRating = userMovies.MovieRating
@@ -118,12 +116,18 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                 UserId = userid // Associate the movie with the specified user
             };
 
+            var responsedto = new UserMoviesDTOResponse
+            {
+                Id = newUserMovie.Id,
+                MovieName = newUserMovie.MovieName,
+                MovieWatched = newUserMovie.MovieWatched,
+                MovieRating = newUserMovie.MovieRating
+            };
+
             _context.UserMovies.Add(newUserMovie);
             await _context.SaveChangesAsync();
 
-
-            userMovies.Id = newUserMovie.Id; // Set the ID of the DTO to the newly created entity's ID
-            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id }, userMovies);
+            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id }, responsedto);
         }
 
         // DELETE: api/UserMovies/5
