@@ -45,12 +45,15 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             return movies;
         }
 
-        /*
+
         // GET: api/UserMovies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserMovies>> GetUserMovies(int id)
+        public async Task<ActionResult<IEnumerable<UserMoviesDTO>>> GetUserMovies(int userid, int id)
         {
-            var userMovies = await _context.UserMovies.FindAsync(id);
+            var userMovies = await _context.UserMovies
+                .Where(um => um.UserId == userid && um.Id == id) 
+                .Select(UserMoviesDTOMapper)
+                .ToListAsync();
 
             if (userMovies == null)
             {
@@ -60,8 +63,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             return userMovies;
         }
 
-        commented out because in the future i may add a future search query feature, where a user can search for a specific movie in their watchlist, idk tho
-        */
+        // commented out because in the future i may add a future search query feature, where a user can search for a specific movie in their watchlist, idk tho
 
         [HttpPatch("/{id}")]
         public async Task<IActionResult> PatchUserMovies(int userid ,int id, [FromBody] JsonPatchDocument<UserMoviesDTO> UpdatedMovies)
@@ -127,7 +129,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
             _context.UserMovies.Add(newUserMovie);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id }, responsedto);
+            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id, userid }, responsedto);
         }
 
         // DELETE: api/UserMovies/5
