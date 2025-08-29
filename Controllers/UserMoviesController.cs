@@ -48,12 +48,12 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         // GET: api/UserMovies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<UserMoviesDTO>>> GetUserMovies(int userid, int id)
+        public async Task<ActionResult<UserMoviesDTO>> GetUserMovies(int userid, int id)
         {
             var userMovies = await _context.UserMovies
                 .Where(um => um.UserId == userid && um.Id == id) 
                 .Select(UserMoviesDTOMapper)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
             if (userMovies == null)
             {
@@ -65,7 +65,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
 
         // commented out because in the future i may add a future search query feature, where a user can search for a specific movie in their watchlist, idk tho
 
-        [HttpPatch("/{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> PatchUserMovies(int userid ,int id, [FromBody] JsonPatchDocument<UserMoviesDTO> UpdatedMovies)
         {
             var userMovies = await _context.UserMovies
@@ -118,6 +118,11 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                 UserId = userid // Associate the movie with the specified user
             };
 
+
+            _context.UserMovies.Add(newUserMovie);
+            await _context.SaveChangesAsync();
+
+
             var responsedto = new UserMoviesDTOResponse
             {
                 Id = newUserMovie.Id,
@@ -126,18 +131,15 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Controllers
                 MovieRating = newUserMovie.MovieRating
             };
 
-            _context.UserMovies.Add(newUserMovie);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUserMovies", new { id = newUserMovie.Id, userid }, responsedto);
+            return CreatedAtAction("GetUserMovies", new { id = responsedto.Id, userid }, responsedto);
         }
 
         // DELETE: api/UserMovies/5
-        [HttpDelete("/{id}")]
-        public async Task<IActionResult> DeleteUserMovies(int UserID, int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserMovies(int userid, int id)
         {
             var usermovie = await _context.UserMovies
-                .FirstOrDefaultAsync(um => um.Id == id && um.UserId == UserID);
+                .FirstOrDefaultAsync(um => um.Id == id && um.UserId == userid);
 
             if (usermovie == null)
             {
