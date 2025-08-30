@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InjectableGET } from './injectableget';
-import { MovieModel } from './MovieModel';
+import { MovieModel } from '../MovieModel';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -13,18 +13,24 @@ import { Observable } from 'rxjs';
   <ng-template #loading>Loading movies...</ng-template>
 
   <input type="text" [(ngModel)]="idinputvalue" placeholder ="Type a user ID"/>
-  <button (click)="submitidinput()">Submit ID</button>
-  <p>CURRENT VALUE: {{ idinputvalue }}</p>
+
+
+  <button (click)="submitidinput()">GET USER ID: {{idinputvalue}}</button>
 
   <p> Movies from user ID {{ idinputvalue }}:</p>
-    <ul>
-      <li *ngFor="let movie of movies$ | async">
+
+  <ul>
+  @for (movie of movies$ | async; track movie.movieName){
+      <li>
         NAME: {{ movie.movieName }} <br>
         WATCHED: {{ movie.movieWatched }} <br>
         RATING: {{ movie.movieRating }}
+        
       </li>
-    </ul>
-
+  } @empty {
+    <p>No movies found. :( </p>
+  }
+  </ul>
 
 
   <H3>input test</H3>
@@ -34,7 +40,9 @@ import { Observable } from 'rxjs';
 
       <p>You typed: {{ Inputvalue }}</p>
   `,
-  styles: ``
+  styles: `button {
+    display: block;
+    }`
 })
 export class MovieGET {
   Inputvalue: string = '';
