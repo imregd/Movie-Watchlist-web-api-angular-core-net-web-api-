@@ -31,17 +31,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
                     b.ToTable("UserData");
                 });
 
-            modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserDTO", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("UserDTO");
-                });
-
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMovies", b =>
                 {
                     b.Property<int>("Id")
@@ -68,32 +57,6 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
                     b.ToTable("UserMovies");
                 });
 
-            modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMoviesDTO", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("MovieName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("MovieRating")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("MovieWatched")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("UserDTOUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserDTOUserId");
-
-                    b.ToTable("UserMoviesDTO");
-                });
-
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMovies", b =>
                 {
                     b.HasOne("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.User", "User")
@@ -105,19 +68,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMoviesDTO", b =>
-                {
-                    b.HasOne("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserDTO", null)
-                        .WithMany("UserMovies")
-                        .HasForeignKey("UserDTOUserId");
-                });
-
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.User", b =>
-                {
-                    b.Navigation("UserMovies");
-                });
-
-            modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserDTO", b =>
                 {
                     b.Navigation("UserMovies");
                 });

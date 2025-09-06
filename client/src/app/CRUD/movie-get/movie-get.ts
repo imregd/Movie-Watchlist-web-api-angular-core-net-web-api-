@@ -31,14 +31,6 @@ import { Observable } from 'rxjs';
     <p>No movies found. :( </p>
   }
   </ul>
-
-
-  <H3>input test</H3>
-      <input type="text" [(ngModel)]="Inputvalue" placeholder ="Type a username"/>
-
-      <button (click)="submitInput()">Submit</button>
-
-      <p>You typed: {{ Inputvalue }}</p>
   `,
   styles: `button {
     display: block;

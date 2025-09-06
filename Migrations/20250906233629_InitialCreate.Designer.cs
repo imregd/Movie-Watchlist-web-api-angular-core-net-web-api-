@@ -10,8 +10,8 @@ using Movie_Watchlist_web_api__angular___core_net_web_api_.DBConstructor;
 namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
 {
     [DbContext(typeof(DB_Constructor))]
-    [Migration("20250811004402_AddUserDataTable")]
-    partial class AddUserDataTable
+    [Migration("20250906233629_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,7 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
 
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMovies", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -50,10 +50,10 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
                     b.Property<bool>("MovieWatched")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -62,9 +62,13 @@ namespace Movie_Watchlist_web_api__angular___core_net_web_api_.Migrations
 
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.UserMovies", b =>
                 {
-                    b.HasOne("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.User", null)
+                    b.HasOne("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.User", "User")
                         .WithMany("UserMovies")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Movie_Watchlist_web_api__angular___core_net_web_api_.DBModel.User", b =>
